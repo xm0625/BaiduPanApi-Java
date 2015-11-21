@@ -1,7 +1,9 @@
 package com.baidupanapi.util;
 
-import org.apache.http.client.CookieStore;
-import org.apache.http.cookie.Cookie;
+
+
+import cz.msebera.android.httpclient.client.CookieStore;
+import cz.msebera.android.httpclient.cookie.Cookie;
 
 import java.util.List;
 
