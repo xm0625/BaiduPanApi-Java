@@ -8,7 +8,6 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="fastjson" level="project" />
-    <orderEntry type="library" scope="TEST" name="httpclient-4.4" level="project" />
     <orderEntry type="library" name="httpclient-android-4.4" level="project" />
   </component>
 </module>
