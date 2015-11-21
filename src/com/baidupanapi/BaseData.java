@@ -1,6 +1,7 @@
 package com.baidupanapi;
 
 
+import com.baidupanapi.util.HttpClientHelper;
 import com.baidupanapi.util.TimeUtil;
 
 import java.io.IOException;
@@ -60,9 +61,8 @@ public class BaseData {
 
 
     public static void main(String[] args) throws Exception {
-	    // write your code here
-        System.out.println(apiTemplate);
-//        BaseClass baseClass = new BaseClass("","",null,null);
+        BaiduPanService baiduPanService = new BaiduPanService("","",null);
+        System.out.println(baiduPanService.quota(null));
     }
 
     public static String getTokenApi(){
