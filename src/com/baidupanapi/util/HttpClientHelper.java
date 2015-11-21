@@ -26,6 +26,12 @@ public class HttpClientHelper {
 
 
     public static CloseableHttpResponse get(CloseableHttpClient httpClient, String url, Map<String, String> params, Map<String, String> headers) throws IOException {
+
+        System.out.println("url:"+url);
+        System.out.println("params:"+MapUtil.getEncodedUrl(params));
+        System.out.println("headers:"+MapUtil.getEncodedUrl(headers));
+
+
         String urlParamString = MapUtil.getEncodedUrl(params);
         if(urlParamString.length()>0){
             if(url.contains("?")){
@@ -46,6 +52,10 @@ public class HttpClientHelper {
     }
 
     public static CloseableHttpResponse post(CloseableHttpClient httpClient, String url, Map<String, String> params, Map<String, String> headers) throws IOException {
+
+        System.out.println("url:"+url);
+        System.out.println("params:"+MapUtil.getEncodedUrl(params));
+        System.out.println("headers:"+MapUtil.getEncodedUrl(headers));
 
         HttpPost httpost = new HttpPost(url);
         for(Map.Entry<String,String> entry:headers.entrySet()){

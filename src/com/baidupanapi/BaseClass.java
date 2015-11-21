@@ -2,7 +2,6 @@ package com.baidupanapi;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.baidupanapi.entity.base.RequestArgEntity;
 import com.baidupanapi.exception.base.LoginFailedException;
 import com.baidupanapi.runnable.base.BaseRunnable;
 import com.baidupanapi.util.*;
@@ -13,10 +12,9 @@ import cz.msebera.android.httpclient.impl.client.CloseableHttpClient;
 import cz.msebera.android.httpclient.impl.client.HttpClients;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.util.*;
 
 /**
@@ -27,7 +25,7 @@ public class BaseClass {
     protected CloseableHttpClient session;
     protected CookieStore cookieStore = new BasicCookieStore();
 
-    protected String apiTemplate = BaseData.apiTemplate;
+    protected String apiTemplate;
     protected String username;
     protected String password;
     protected Map<String,String> user = new HashMap<>();
@@ -36,6 +34,10 @@ public class BaseClass {
     protected BaseRunnable progressRunnable;
 
     BaseClass(String username,String password,String apiTemplate,BaseRunnable captchaRunnable) throws Exception {
+        if(apiTemplate==null){
+            apiTemplate = BaseData.apiTemplate;
+        }
+
         try {
             session = HttpClients.custom().useSystemProperties()
                     .setDefaultCookieStore(cookieStore)
@@ -45,6 +47,7 @@ public class BaseClass {
                     .setDefaultCookieStore(cookieStore)
                     .build();
         }
+        this.apiTemplate = apiTemplate;
         this.username = username;
         this.password = password;
         if(captchaRunnable != null){
@@ -52,6 +55,7 @@ public class BaseClass {
         }else{
             this.captchaRunnable = new ShowCaptchaRunnable();
         }
+        this.progressRunnable = null;
 
         System.out.println("设置pcs服务器");
         setPcsServer(getFastestPcsServer());
@@ -63,8 +67,8 @@ public class BaseClass {
      * 通过百度返回设置最快的pcs服务器
      * */
     public String getFastestPcsServer() throws IOException {
-        String result = HttpClientHelper.getResponseString(HttpClientHelper.get(session, BaseData.GET_FASTEST_PCS_SERVER_API));
-        JSONObject jsonObject = (JSONObject) JSON.parse(result);
+        String content = HttpClientHelper.getResponseString(HttpClientHelper.get(session, BaseData.GET_FASTEST_PCS_SERVER_API));
+        JSONObject jsonObject = (JSONObject) JSON.parse(content);
         return jsonObject.getString("host");
     }
 
@@ -98,16 +102,20 @@ public class BaseClass {
         System.out.println("保存Cookie");
     }
 
+    protected void clearCookies(){
+        System.out.println("清理Cookie");
+    }
+
     protected String getToken() throws IOException {
-        String result = HttpClientHelper.getResponseString(HttpClientHelper.get(session, BaseData.getTokenApi()));
-        JSONObject jsonObject = (JSONObject) JSON.parse(result);
+        String content = HttpClientHelper.getResponseString(HttpClientHelper.get(session, BaseData.getTokenApi()));
+        JSONObject jsonObject = (JSONObject) JSON.parse(content);
         return jsonObject.getJSONObject("data").getString("token");
     }
 
     protected void login() throws Exception {
         String captcha = "";
         String codeString = "";
-        String content = "";
+        String content;
         PublicKeyEntity publicKeyEntity = getPublickey();
         String passwordEncrypted = RSAUtils.encryptToBase64StringByPublicKey(RSAUtils.readPublicKey(publicKeyEntity.getPublicKey()),password);
         while (true){
@@ -184,65 +192,79 @@ public class BaseClass {
         return new PublicKeyEntity(jsonObject.getString("pubkey"),jsonObject.getString("key"));
     }
 
-    protected CloseableHttpResponse request(String uri,RequestArgEntity requestArgEntity) throws IOException {
-        CloseableHttpResponse response = null;
-        String api = "";
+    protected String checkLogin(CloseableHttpResponse response) throws IOException {
+        String content = HttpClientHelper.getResponseString(response);
+        try {
+            JSONObject jsonObject = (JSONObject) JSON.parse(content);
+            if(jsonObject.containsKey("errno") && String.valueOf(jsonObject.get("errno")).equals("-6")){
+                clearCookies();
+                initiate();
+            }else{
+                return content;
+            }
+        }catch (Exception e){
+        }
+        return null;
+
+    }
+
+
+
+    protected String request(String uri,String method, String url, Map<String,String> extraParams, Map<String,String> data, Map<String,File> files, BaseRunnable callback, Map<String,Object> keyValueArgs) throws IOException {
+        if(keyValueArgs == null){
+            keyValueArgs = new HashMap<>();
+        }
+
+        CloseableHttpResponse response;
+        String api;
+
         Map<String,String> params = new HashMap<>();
         params.put("","");
-        params.put("method",requestArgEntity.getMethod());
+        params.put("method",method);
         params.put("app_id","250528");
         params.put("BDUSS",user.get("BDUSS"));
         params.put("t",TimeUtil.getSecondTime());
         params.put("bdstoken",user.get("token"));
 
-        if(requestArgEntity.getExtraParams()!=null){
-            MapUtil.updateMap(params,requestArgEntity.getExtraParams());
+        if(extraParams!=null){
+            MapUtil.updateMap(params,extraParams);
             MapUtil.removeNullPair(params);
         }
 
         Map<String,String> headers = new HashMap<>();
         headers.putAll(BaseData.baidupanHeaders);
-        if(requestArgEntity.getArgMap().containsKey("headers")){
-            MapUtil.updateMap(headers, (Map) requestArgEntity.getArgMap().get("headers"));
-            requestArgEntity.getArgMap().remove("headers");
+        if(keyValueArgs.containsKey("headers")){
+            MapUtil.updateMap(headers, (Map) keyValueArgs.get("headers"));
+            keyValueArgs.remove("headers");
         }
 
-        if(requestArgEntity.getUrl()==null){
-            requestArgEntity.setUrl(String.format(BaseData.apiTemplate,uri));
+        if(url==null){
+            url = String.format(apiTemplate,uri);
         }
 
-        if(requestArgEntity.getData()!=null || requestArgEntity.getFiles()!=null){
-            if(requestArgEntity.getUrl().contains("?")){
-                api = String.format("%s&%s",requestArgEntity.getUrl(), MapUtil.getEncodedUrl(params));
+        if(data!=null || files!=null){
+            if(url.contains("?")){
+                api = String.format("%s&%s",url, MapUtil.getEncodedUrl(params));
             }else{
-                api = String.format("%s?%s",requestArgEntity.getUrl(), MapUtil.getEncodedUrl(params));
+                api = String.format("%s?%s",url, MapUtil.getEncodedUrl(params));
             }
 
-            if(requestArgEntity.getData()!=null){
-                MapUtil.removeNullPair(requestArgEntity.getData());
-                response = HttpClientHelper.post(session,api,requestArgEntity.getData(),headers);
+            if(data!=null){
+                MapUtil.removeNullPair(data);
+                response = HttpClientHelper.post(session,api,data,headers);
             }else{
-                MapUtil.removeNullPair(requestArgEntity.getFiles());
+                MapUtil.removeNullPair(files);
                 throw new RuntimeException("File Upload Feature Not Done!!!");
             }
         }else{
-//            api = url
-//            if uri == 'filemanager' or uri == 'rapidupload' or uri == 'filemetas' or uri == 'precreate':
-//            response = self.session.post(
-//                    api, params=params, verify=False, headers=headers, **kwargs)
-//            else:
-//            response = self.session.get(
-//                    api, params=params, verify=False, headers=headers, **kwargs)
-            api = requestArgEntity.getUrl();
+            api = url;
             if(uri.equals("filemanager") || uri.equals("rapidupload") || uri.equals("filemetas") || uri.equals("precreate")){
                 response = HttpClientHelper.post(session,api,params,headers);
             }else{
                 response = HttpClientHelper.post(session,api,params,headers);
             }
         }
-
-        return response;
-
+        return checkLogin(response);
     }
 
     class ShowCaptchaRunnable extends BaseRunnable {
