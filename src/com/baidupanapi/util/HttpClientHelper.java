@@ -16,26 +16,42 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.CookieHandler;
 import java.net.CookieManager;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Created by xm on 15-11-19.
  */
 public class HttpClientHelper {
-    public static final String COOKIES_FILE_NAME = "cookies.conf";
+    public static final String CHARSET = "utf-8";
 
-    public static String get(CloseableHttpClient httpClient, String url) throws IOException {
+
+    public static CloseableHttpResponse get(CloseableHttpClient httpClient, String url, Map<String, String> params, Map<String, String> headers) throws IOException {
+        String urlParamString = MapUtil.getEncodedUrl(params);
+        if(urlParamString.length()>0){
+            if(url.contains("?")){
+                url = String.format("%s&%s",url,urlParamString);
+            }else{
+                url = String.format("%s?%s",url,urlParamString);
+            }
+        }
         HttpGet httpGet = new HttpGet(url);
-        CloseableHttpResponse response=httpClient.execute(httpGet);
-        return EntityUtils.toString(response.getEntity(), "utf-8");
+        for(Map.Entry<String,String> entry:headers.entrySet()){
+            httpGet.setHeader(entry.getKey(),entry.getValue());
+        }
+        return httpClient.execute(httpGet);
     }
-    public static String post(CloseableHttpClient httpClient, String url,Map<String, String> params) throws IOException {
+
+    public static CloseableHttpResponse get(CloseableHttpClient httpClient, String url) throws IOException {
+        return get(httpClient, url,new HashMap<>(),new HashMap<>());
+    }
+
+    public static CloseableHttpResponse post(CloseableHttpClient httpClient, String url, Map<String, String> params, Map<String, String> headers) throws IOException {
 
         HttpPost httpost = new HttpPost(url);
-        List<NameValuePair> nvps = new ArrayList<NameValuePair>();
+        for(Map.Entry<String,String> entry:headers.entrySet()){
+            httpost.setHeader(entry.getKey(),entry.getValue());
+        }
+        List<NameValuePair> nvps = new ArrayList<>();
 
         Set<String> keySet = params.keySet();
         for(String key : keySet) {
@@ -43,9 +59,24 @@ public class HttpClientHelper {
         }
         httpost.setEntity(new UrlEncodedFormEntity(nvps, HTTP.UTF_8));
 
-        CloseableHttpResponse response=httpClient.execute(httpost);
-        return EntityUtils.toString(response.getEntity(), "utf-8");
+        return httpClient.execute(httpost);
     }
+
+    public static CloseableHttpResponse post(CloseableHttpClient httpClient, String url,Map<String, String> params) throws IOException {
+        return post(httpClient, url, params, new HashMap<>());
+    }
+
+    public static String getResponseString(CloseableHttpResponse response,String charset) throws IOException {
+        if(charset == null){
+            charset = CHARSET;
+        }
+        return EntityUtils.toString(response.getEntity(), charset);
+    }
+
+    public static String getResponseString(CloseableHttpResponse response) throws IOException {
+        return getResponseString(response, null);
+    }
+
 
     public static void dumpCookies(CookieStore cookieStore){
         System.out.println("dump");

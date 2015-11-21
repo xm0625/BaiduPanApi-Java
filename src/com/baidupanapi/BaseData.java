@@ -26,16 +26,16 @@ public class BaseData {
     public static final String BAIDUPAN_SERVER = "pan.baidu.com";
     public static String BAIDUPCS_SERVER = "pcs.baidu.com";
 
-    public static Map<String,Object> baidupanHeaders;
+    public static Map<String,String> baidupanHeaders;
     static{
-        baidupanHeaders = new HashMap<String, Object>();
+        baidupanHeaders = new HashMap<String, String>();
         baidupanHeaders.put("Referer", "http://pan.baidu.com/disk/home");
         baidupanHeaders.put("User-Agent", "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/46.0.2490.80 Safari/537.36");
     }
 
     public static String apiTemplate;
     static{
-        apiTemplate = String.format("http://%s/api/{0}", BAIDUPAN_SERVER);
+        apiTemplate = String.format("http://%s/api/%s", BAIDUPAN_SERVER,"%s");
     }
 
     public static Map<String,String> errorMessageMap = new HashMap<>();
@@ -61,7 +61,8 @@ public class BaseData {
 
     public static void main(String[] args) throws Exception {
 	    // write your code here
-        BaseClass baseClass = new BaseClass("","",null,null);
+        System.out.println(apiTemplate);
+//        BaseClass baseClass = new BaseClass("","",null,null);
     }
 
     public static String getTokenApi(){

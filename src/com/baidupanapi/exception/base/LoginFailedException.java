@@ -1,4 +1,4 @@
-package com.baidupanapi.exception;
+package com.baidupanapi.exception.base;
 
 /**
  * 因为帐号原因引起的登录失败异常
