@@ -11,10 +11,8 @@ import cz.msebera.android.httpclient.impl.client.BasicCookieStore;
 import cz.msebera.android.httpclient.impl.client.CloseableHttpClient;
 import cz.msebera.android.httpclient.impl.client.HttpClients;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
+import java.net.URLConnection;
 import java.util.*;
 
 /**
@@ -210,7 +208,7 @@ public class BaseClass {
 
 
 
-    protected String request(String uri,String method, String url, Map<String,String> extraParams, Map<String,String> data, Map<String,File> files, BaseRunnable callback, Map<String,Object> keyValueArgs) throws IOException {
+    protected String request(String uri,String method, String url, Map<String,String> extraParams, Map<String,String> data, Map<String,Object> files, BaseRunnable callback, Map<String,Object> keyValueArgs) throws IOException {
         if(keyValueArgs == null){
             keyValueArgs = new HashMap<>();
         }
@@ -254,6 +252,14 @@ public class BaseClass {
                 response = HttpClientHelper.post(session,api,data,headers);
             }else{
                 MapUtil.removeNullPair(files);
+
+                BufferedInputStream is = new BufferedInputStream(new FileInputStream((File)((Object[])files.get("files"))[1]));
+                String mimeType = URLConnection.guessContentTypeFromStream(is);
+                if(mimeType == null) {
+                    throw new IOException("can't get mime type of file");
+                }
+                headers.put("Content-Type",mimeType);
+                //TODO 文件上传尚未完成
                 throw new RuntimeException("File Upload Feature Not Done!!!");
             }
         }else{

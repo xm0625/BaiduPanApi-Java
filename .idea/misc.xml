@@ -1,5 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="EclipseCodeFormatter">
+    <option name="defaultSettings" value="true" />
+    <option name="id" value="1450175531546" />
+    <option name="name" value="default" />
+    <option name="pathToConfigFileJava" value="$PROJECT_DIR$/../../工作/99banking_eclipse_codetemplates.xml" />
+    <option name="useOldEclipseJavaFormatter" value="true" />
+  </component>
   <component name="EntryPointsManager">
     <entry_points version="2.0" />
   </component>
