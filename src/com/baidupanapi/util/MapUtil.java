@@ -15,7 +15,7 @@ public class MapUtil {
     public static void removeNullPair(Map map){
         List<Object> nullPairKeyList = new ArrayList<>();
         for(Object key:map.keySet()){
-            if(map.get(key) == null){
+            if("".equals(key) || map.get(key) == null){
                 nullPairKeyList.add(key);
             }
         }

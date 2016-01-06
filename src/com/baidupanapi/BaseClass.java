@@ -5,14 +5,36 @@ import com.alibaba.fastjson.JSONObject;
 import com.baidupanapi.exception.base.LoginFailedException;
 import com.baidupanapi.runnable.base.BaseRunnable;
 import com.baidupanapi.util.*;
+import com.sun.corba.se.impl.legacy.connection.DefaultSocketFactory;
+import cz.msebera.android.httpclient.HttpHost;
 import cz.msebera.android.httpclient.client.CookieStore;
 import cz.msebera.android.httpclient.client.methods.CloseableHttpResponse;
+import cz.msebera.android.httpclient.config.Registry;
+import cz.msebera.android.httpclient.config.RegistryBuilder;
+import cz.msebera.android.httpclient.conn.ClientConnectionManager;
+import cz.msebera.android.httpclient.conn.scheme.PlainSocketFactory;
+import cz.msebera.android.httpclient.conn.socket.ConnectionSocketFactory;
+import cz.msebera.android.httpclient.conn.socket.PlainConnectionSocketFactory;
+import cz.msebera.android.httpclient.conn.ssl.SSLConnectionSocketFactory;
+import cz.msebera.android.httpclient.conn.ssl.TrustSelfSignedStrategy;
+import cz.msebera.android.httpclient.conn.ssl.TrustStrategy;
+import cz.msebera.android.httpclient.conn.ssl.X509HostnameVerifier;
 import cz.msebera.android.httpclient.impl.client.BasicCookieStore;
 import cz.msebera.android.httpclient.impl.client.CloseableHttpClient;
 import cz.msebera.android.httpclient.impl.client.HttpClients;
+import cz.msebera.android.httpclient.impl.conn.PoolingHttpClientConnectionManager;
+import cz.msebera.android.httpclient.impl.conn.tsccm.ThreadSafeClientConnManager;
+import cz.msebera.android.httpclient.ssl.SSLContextBuilder;
+import cz.msebera.android.httpclient.ssl.SSLContexts;
 
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLException;
+import javax.net.ssl.SSLSession;
+import javax.net.ssl.SSLSocket;
 import java.io.*;
 import java.net.URLConnection;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
 import java.util.*;
 
 /**
@@ -37,13 +59,31 @@ public class BaseClass {
         }
 
         try {
+            //通过代理访问
+
             session = HttpClients.custom().useSystemProperties()
-                    .setDefaultCookieStore(cookieStore)
+                    .setDefaultCookieStore(cookieStore).setProxy(new HttpHost("127.0.0.1", 4443)).setConnectionManager(HttpClientHelper.getSSLNoCheckConnectionManager())
                     .build();
+
+            //正常访问
+            /**
+             session = HttpClients.custom().useSystemProperties()
+             .setDefaultCookieStore(cookieStore)
+             .build();
+             */
         }catch (NoClassDefFoundError e){
+            //通过代理访问
+
             session = HttpClients.custom()
-                    .setDefaultCookieStore(cookieStore)
+                    .setDefaultCookieStore(cookieStore).setProxy(new HttpHost("127.0.0.1", 4443)).setConnectionManager(HttpClientHelper.getSSLNoCheckConnectionManager())
                     .build();
+
+            //正常访问
+            /**
+             session = HttpClients.custom()
+             .setDefaultCookieStore(cookieStore)
+             .build();
+             */
         }
         this.apiTemplate = apiTemplate;
         this.username = username;
@@ -208,7 +248,7 @@ public class BaseClass {
 
 
 
-    protected String request(String uri,String method, String url, Map<String,String> extraParams, Map<String,String> data, Map<String,Object> files, BaseRunnable callback, Map<String,Object> keyValueArgs) throws IOException {
+    protected String request(String uri,String method, String url, Map<String,String> extraParams, Map<String,String> data, Map<String,File> files, BaseRunnable callback, Map<String,Object> keyValueArgs) throws IOException {
         if(keyValueArgs == null){
             keyValueArgs = new HashMap<>();
         }
@@ -217,7 +257,6 @@ public class BaseClass {
         String api;
 
         Map<String,String> params = new HashMap<>();
-        params.put("","");
         params.put("method",method);
         params.put("app_id","250528");
         params.put("BDUSS",user.get("BDUSS"));
@@ -252,22 +291,14 @@ public class BaseClass {
                 response = HttpClientHelper.post(session,api,data,headers);
             }else{
                 MapUtil.removeNullPair(files);
-
-                BufferedInputStream is = new BufferedInputStream(new FileInputStream((File)((Object[])files.get("files"))[1]));
-                String mimeType = URLConnection.guessContentTypeFromStream(is);
-                if(mimeType == null) {
-                    throw new IOException("can't get mime type of file");
-                }
-                headers.put("Content-Type",mimeType);
-                //TODO 文件上传尚未完成
-                throw new RuntimeException("File Upload Feature Not Done!!!");
+                response = HttpClientHelper.post(session,api,null,files,headers);
             }
         }else{
             api = url;
             if(uri.equals("filemanager") || uri.equals("rapidupload") || uri.equals("filemetas") || uri.equals("precreate")){
                 response = HttpClientHelper.post(session,api,params,headers);
             }else{
-                response = HttpClientHelper.post(session,api,params,headers);
+                response = HttpClientHelper.get(session,api,params,headers);
             }
         }
         return checkLogin(response);

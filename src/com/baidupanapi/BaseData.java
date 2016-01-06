@@ -1,11 +1,16 @@
 package com.baidupanapi;
 
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.baidupanapi.util.HttpClientHelper;
 import com.baidupanapi.util.TimeUtil;
 
+import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class BaseData {
@@ -62,7 +67,12 @@ public class BaseData {
 
     public static void main(String[] args) throws Exception {
         BaiduPanService baiduPanService = new BaiduPanService("","",null);
-        System.out.println(baiduPanService.quota(null));
+        Map<String,Object> extraParams = new HashMap<>();
+//        Map<String,String> headers = new HashMap<>();
+//        headers.put("Range","bytes=0-100000000000");
+//        extraParams.put("headers",headers);
+        System.out.println(baiduPanService.download("/idea/sum1.png", extraParams));
+
     }
 
     public static String getTokenApi(){
