@@ -63,30 +63,26 @@ public class BaseClass {
 
         try {
             //通过代理访问
-
+            /**
             session = HttpClients.custom().useSystemProperties()
                     .setDefaultCookieStore(cookieStore).setProxy(new HttpHost("127.0.0.1", 4443)).setConnectionManager(HttpClientHelper.getSSLNoCheckConnectionManager())
                     .build();
-
-            //正常访问
-            /**
-             session = HttpClients.custom().useSystemProperties()
-             .setDefaultCookieStore(cookieStore)
-             .build();
              */
+            //正常访问
+             session = HttpClients.custom().useSystemProperties()
+                     .setDefaultCookieStore(cookieStore).setConnectionManager(HttpClientHelper.getSSLNoCheckConnectionManager())
+             .build();
         }catch (NoClassDefFoundError e){
             //通过代理访问
-
+            /**
             session = HttpClients.custom()
                     .setDefaultCookieStore(cookieStore).setProxy(new HttpHost("127.0.0.1", 4443)).setConnectionManager(HttpClientHelper.getSSLNoCheckConnectionManager())
                     .build();
-
-            //正常访问
-            /**
-             session = HttpClients.custom()
-             .setDefaultCookieStore(cookieStore)
-             .build();
              */
+            //正常访问
+             session = HttpClients.custom()
+             .setDefaultCookieStore(cookieStore).setConnectionManager(HttpClientHelper.getSSLNoCheckConnectionManager())
+             .build();
         }
         this.apiTemplate = apiTemplate;
         this.username = username;
@@ -264,7 +260,7 @@ public class BaseClass {
         params.put("app_id","250528");
         params.put("BDUSS",user.get("BDUSS"));
         params.put("t",TimeUtil.getSecondTime());
-        params.put("bdstoken",user.get("token"));
+        params.put("bdstoken", user.get("token"));
 
         if(extraParams!=null){
             MapUtil.updateMap(params,extraParams);

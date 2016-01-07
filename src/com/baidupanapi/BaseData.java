@@ -68,7 +68,7 @@ public class BaseData {
 
     public static void main(String[] args) throws Exception {
         BaiduPanService baiduPanService = new BaiduPanService("","",null);
-        System.out.println(HttpClientHelper.getResponseString(baiduPanService.quota(null)));
+        System.out.println(HttpClientHelper.getResponseString(baiduPanService.mkdir("/pcs/",null)));
     }
 
     public static String getTokenApi(){
