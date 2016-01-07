@@ -18,6 +18,7 @@ import cz.msebera.android.httpclient.conn.ssl.SSLConnectionSocketFactory;
 import cz.msebera.android.httpclient.conn.ssl.SSLSocketFactory;
 import cz.msebera.android.httpclient.conn.ssl.TrustStrategy;
 import cz.msebera.android.httpclient.conn.ssl.X509HostnameVerifier;
+import cz.msebera.android.httpclient.entity.BufferedHttpEntity;
 import cz.msebera.android.httpclient.entity.ContentType;
 import cz.msebera.android.httpclient.entity.mime.MultipartEntityBuilder;
 import cz.msebera.android.httpclient.entity.mime.content.FileBody;
@@ -124,15 +125,21 @@ public class HttpClientHelper {
         return post(httpClient, url, params, new HashMap<>());
     }
 
-    public static String getResponseString(CloseableHttpResponse response,String charset) throws IOException {
+
+
+    public static String getResponseString(BufferedHttpEntity bufferedHttpEntity,String charset) throws IOException {
         if(charset == null){
             charset = CHARSET;
         }
-        return EntityUtils.toString(response.getEntity(), charset);
+        return EntityUtils.toString(bufferedHttpEntity, charset);
     }
 
-    public static String getResponseString(CloseableHttpResponse response) throws IOException {
-        return getResponseString(response, null);
+    public static String getResponseString(CloseableHttpResponse closeableHttpResponse) throws IOException {
+        return getResponseString(new BufferedHttpEntity(closeableHttpResponse.getEntity()), null);
+    }
+
+    public static String getResponseString(BufferedHttpEntity bufferedHttpEntity) throws IOException {
+        return getResponseString(bufferedHttpEntity, null);
     }
 
 

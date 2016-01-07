@@ -7,6 +7,7 @@ import com.baidupanapi.util.HttpClientHelper;
 import com.baidupanapi.util.TimeUtil;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -67,12 +68,7 @@ public class BaseData {
 
     public static void main(String[] args) throws Exception {
         BaiduPanService baiduPanService = new BaiduPanService("","",null);
-        Map<String,Object> extraParams = new HashMap<>();
-//        Map<String,String> headers = new HashMap<>();
-//        headers.put("Range","bytes=0-100000000000");
-//        extraParams.put("headers",headers);
-        System.out.println(baiduPanService.download("/idea/sum1.png", extraParams));
-
+        System.out.println(HttpClientHelper.getResponseString(baiduPanService.quota(null)));
     }
 
     public static String getTokenApi(){

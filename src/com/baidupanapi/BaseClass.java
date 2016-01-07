@@ -19,6 +19,8 @@ import cz.msebera.android.httpclient.conn.ssl.SSLConnectionSocketFactory;
 import cz.msebera.android.httpclient.conn.ssl.TrustSelfSignedStrategy;
 import cz.msebera.android.httpclient.conn.ssl.TrustStrategy;
 import cz.msebera.android.httpclient.conn.ssl.X509HostnameVerifier;
+import cz.msebera.android.httpclient.entity.BufferedHttpEntity;
+import cz.msebera.android.httpclient.entity.ContentType;
 import cz.msebera.android.httpclient.impl.client.BasicCookieStore;
 import cz.msebera.android.httpclient.impl.client.CloseableHttpClient;
 import cz.msebera.android.httpclient.impl.client.HttpClients;
@@ -26,6 +28,7 @@ import cz.msebera.android.httpclient.impl.conn.PoolingHttpClientConnectionManage
 import cz.msebera.android.httpclient.impl.conn.tsccm.ThreadSafeClientConnManager;
 import cz.msebera.android.httpclient.ssl.SSLContextBuilder;
 import cz.msebera.android.httpclient.ssl.SSLContexts;
+import cz.msebera.android.httpclient.util.EntityUtils;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLException;
@@ -230,25 +233,25 @@ public class BaseClass {
         return new PublicKeyEntity(jsonObject.getString("pubkey"),jsonObject.getString("key"));
     }
 
-    protected String checkLogin(CloseableHttpResponse response) throws IOException {
-        String content = HttpClientHelper.getResponseString(response);
-        try {
-            JSONObject jsonObject = (JSONObject) JSON.parse(content);
-            if(jsonObject.containsKey("errno") && String.valueOf(jsonObject.get("errno")).equals("-6")){
-                clearCookies();
-                initiate();
-            }else{
-                return content;
+    protected BufferedHttpEntity checkLogin(BufferedHttpEntity bufferedHttpEntity) throws IOException {
+        if(ContentType.getOrDefault(bufferedHttpEntity).getMimeType().contains("application/json")) {
+            String content = HttpClientHelper.getResponseString(bufferedHttpEntity);
+            System.out.println("checkLogin() content:"+content);
+            try {
+                JSONObject jsonObject = (JSONObject) JSON.parse(content);
+                if (jsonObject.containsKey("errno") && String.valueOf(jsonObject.get("errno")).equals("-6")) {
+                    clearCookies();
+                    initiate();
+                }
+            } catch (Exception e) {
             }
-        }catch (Exception e){
         }
-        return null;
-
+        return bufferedHttpEntity;
     }
 
 
 
-    protected String request(String uri,String method, String url, Map<String,String> extraParams, Map<String,String> data, Map<String,File> files, BaseRunnable callback, Map<String,Object> keyValueArgs) throws IOException {
+    protected BufferedHttpEntity request(String uri,String method, String url, Map<String,String> extraParams, Map<String,String> data, Map<String,File> files, BaseRunnable callback, Map<String,Object> keyValueArgs) throws IOException {
         if(keyValueArgs == null){
             keyValueArgs = new HashMap<>();
         }
@@ -301,7 +304,9 @@ public class BaseClass {
                 response = HttpClientHelper.get(session,api,params,headers);
             }
         }
-        return checkLogin(response);
+        BufferedHttpEntity bufferedHttpEntity = new BufferedHttpEntity(response.getEntity());
+        checkLogin(bufferedHttpEntity);
+        return bufferedHttpEntity;
     }
 
     class ShowCaptchaRunnable extends BaseRunnable {
