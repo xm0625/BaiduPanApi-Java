@@ -10,6 +10,7 @@ import cz.msebera.android.httpclient.entity.BufferedHttpEntity;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -311,6 +312,39 @@ public class BaiduPanService extends BaseClass{
         return request("filemetas?blocks=0&dlink=1","filemetas",null,null,data,null,null,keyValueArgs);
     }
 
+    /**
+     * 移动文件或文件夹
+     *
+     * @param remotePathList
+     * 待移动的 文件/目录 路径列表
+     *
+     * @param destDir
+     * 移动到的目标目录(结尾有没有/都可以)
+     *
+     * @return
+     * 返回BufferedHttpEntity对象
+     *
+     * 返回正确时返回的 Reponse 对象 content 中的数据结构
+     * {"errno":0,"info":[{"errno":0,"path":"\/idea\/sum1.png"}],"request_id":171996442348120975}
+     * */
+    public BufferedHttpEntity move(List<String> remotePathList, String destDir,Map<String,Object> keyValueArgs) throws IOException{
 
+        Map<String,String> params = new HashMap<>();
+        params.put("opera","move");
+
+        List<Map> fileList = new ArrayList<>();
+        for(String remotePath:remotePathList) {
+            Map<String, String> fileInfo = new HashMap<>();
+            fileInfo.put("path",remotePath);
+            fileInfo.put("dest",destDir);
+            fileInfo.put("newname", new File(remotePath.trim()).getName());
+            fileList.add(fileInfo);
+        }
+        Map<String,String> data = new HashMap<>();
+        data.put("filelist",JSON.toJSONString(fileList));
+
+        String url = String.format("http://%s/api/filemanager",BaseData.BAIDUPAN_SERVER);
+        return request("filemanager","move",url,params,data,null,null,keyValueArgs);
+    }
 
 }
