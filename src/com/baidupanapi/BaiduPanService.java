@@ -290,15 +290,15 @@ public class BaiduPanService extends BaseClass{
     }
 
     /**
-     * 批量获得文件的meta信息(元信息)
+     * 批量获得 文件/目录 的meta信息(元信息)
      *
      * @param remotePathList
-     * 文件路径列表
+     * 文件/目录 路径列表
      *
      * @return
      * 返回BufferedHttpEntity对象
      *
-     * 文件不存在时返回的 Reponse 对象 content 中的数据结构
+     * 文件/目录 不存在时返回的 Reponse 对象 content 中的数据结构
      * {"errno":12,"info":[{"errno":-9}],"request_id":3294861771}
      *
      * 返回正确时返回的 Reponse 对象 content 中的数据结构
@@ -310,5 +310,7 @@ public class BaiduPanService extends BaseClass{
 
         return request("filemetas?blocks=0&dlink=1","filemetas",null,null,data,null,null,keyValueArgs);
     }
+
+
 
 }
