@@ -30,7 +30,7 @@ logging.basicConfig(level=logging.DEBUG,
 BAIDUPAN_SERVER = 'pan.baidu.com'
 BAIDUPCS_SERVER = 'pcs.baidu.com'
 BAIDUPAN_HEADERS = {"Referer": "http://pan.baidu.com/disk/home",
-                    "User-Agent": "netdisk;4.6.2.0;PC;PC-Windows;10.0.10240;WindowsBaiduYunGuanJia"}
+                    "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/46.0.2490.80 Safari/537.36"}
 
 # https://pcs.baidu.com/rest/2.0/pcs/manage?method=listhost -> baidu cdn
 # uses CDN_DOMAIN/monitor.jpg to test speed for each CDN
@@ -99,6 +99,7 @@ def check_login(func):
         ret = func(*args, **kwargs)
         if type(ret) == requests.Response:
             try:
+                print "check_login()"
                 foo = json.loads(ret.content)
                 if foo.has_key('errno') and foo['errno'] == -6:
                     logging.debug(
@@ -119,7 +120,9 @@ class BaseClass(object):
     """
 
     def __init__(self, username, password, api_template=api_template, captcha_func=None):
+        print "初始化1"
         self.session = requests.session()
+        self.session.proxies = {}
         self.api_template = api_template
         self.username = username
         self.password = password
@@ -176,7 +179,7 @@ class BaseClass(object):
 
     def _initiate(self):
         if not self._load_cookies():
-            self.session.get('http://www.baidu.com')
+            self.session.get('http://www.baidu.com', verify=False)
             self.user['token'] = self._get_token()
             self._login()
         else:
@@ -207,7 +210,7 @@ class BaseClass(object):
     def _get_token(self):
         # Token
         ret = self.session.get(
-            'https://passport.baidu.com/v2/api/?getapi&tpl=mn&apiver=v3&class=login&tt=%s&logintype=dialogLogin&callback=0' % int(time.time())).text.replace('\'', '\"')
+            'https://passport.baidu.com/v2/api/?getapi&tpl=mn&apiver=v3&class=login&tt=%s&logintype=dialogLogin&callback=0' % int(time.time()), verify=False).text.replace('\'', '\"')
         foo = json.loads(ret)
         logging.info('token %s' % foo['data']['token'])
         return foo['data']['token']
@@ -229,8 +232,8 @@ class BaseClass(object):
 
     def _get_publickey(self):
         url = 'https://passport.baidu.com/v2/getpublickey?token=' + \
-            self.user['token']
-        content = self.session.get(url).content
+              self.user['token']
+        content = self.session.get(url, verify=False).content
         jdata = json.loads(content.replace('\'','"'))
         return (jdata['pubkey'], jdata['key'])
 
@@ -267,7 +270,7 @@ class BaseClass(object):
                           'ppui_logintime': '50918',
                           'callback': 'parent.bd__pcbs__oa36qm'}
             result = self.session.post(
-                'https://passport.baidu.com/v2/api/?login', data=login_data)
+                'https://passport.baidu.com/v2/api/?login', data=login_data, verify=False)
 
             # 是否需要验证码
             if 'err_no=257' in result.content or 'err_no=6' in result.content:
@@ -413,7 +416,7 @@ class PCS(BaseClass):
             if errno == 112:
                 # 页面失效, 重新刷新页面
                 url = 'http://pan.baidu.com/disk/home'
-                self.session.get(url)
+                self.session.get(url, verify=False)
 
             return
 
@@ -487,6 +490,8 @@ class PCS(BaseClass):
 
         """
 
+        #self.session.proxies = {'http': 'http://127.0.0.1:4443',
+        #                       'https': 'http://127.0.0.1:4443'}
         params = {
             'dir': dir,
             'ondup': ondup,
@@ -599,7 +604,7 @@ class PCS(BaseClass):
         # refered:
         # https://github.com/PeterDing/iScript/blob/master/pan.baidu.com.py
         url = 'http://pan.baidu.com/disk/home'
-        r = self.session.get(url)
+        r = self.session.get(url, verify=False)
         html = r.content
         sign1 = re.search(r'sign1 = \'(.+?)\';', html).group(1)
         sign3 = re.search(r'sign3 = \'(.+?)\';', html).group(1)
@@ -664,7 +669,7 @@ class PCS(BaseClass):
         def get_url(dlink):
             return self.session.get(dlink,
                                     headers=BAIDUPAN_HEADERS,
-                                    stream=True).url
+                                    stream=True, verify=False).url
 
         if not hasattr(self, 'dsign'):
             self.get_sign()
@@ -759,7 +764,7 @@ class PCS(BaseClass):
                     # params error
                     return 31023
             return ret.content
- 
+
     def mkdir(self, remote_path, **kwargs):
         """为当前用户创建一个目录.
 
@@ -861,9 +866,9 @@ class PCS(BaseClass):
         }
         data = {
             'filelist': json.dumps([{
-                "path": path,
-                "dest": dest,
-                "newname": __path(path)} for path in path_list]),
+                                        "path": path,
+                                        "dest": dest,
+                                        "newname": __path(path)} for path in path_list]),
         }
         url = 'http://{0}/api/filemanager'.format(BAIDUPAN_SERVER)
         return self._request('filemanager', 'move', url=url, data=data, extra_params=params, **kwargs)
@@ -912,9 +917,9 @@ class PCS(BaseClass):
         }
         data = {
             'filelist': json.dumps([{
-                "path": path,
-                "dest": dest,
-                "newname": __path(path)} for path in path_list]),
+                                        "path": path,
+                                        "dest": dest,
+                                        "newname": __path(path)} for path in path_list]),
         }
         url = 'http://{0}/api/filemanager'.format(BAIDUPAN_SERVER)
         return self._request('filemanager', 'move', url=url, data=data, extra_params=params, **kwargs)
@@ -1618,4 +1623,3 @@ class PCS(BaseClass):
                 'block_list': json.dumps(block_list)}
 
         return self._request('precreate', 'post', data=data, **kwargs)
-
