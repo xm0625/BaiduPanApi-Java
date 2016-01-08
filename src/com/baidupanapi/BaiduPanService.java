@@ -549,5 +549,24 @@ public class BaiduPanService extends BaseClass{
         return request("thumbnail","generate",url,params,null,null,null,keyValueArgs);
     }
 
+    public BufferedHttpEntity getStreaming(String remotePath,String streamType,Map<String,Object> keyValueArgs) throws IOException{
+        //设置默认值
+        if(streamType == null){
+            streamType = "M3U8_AUTO_480";
+        }
+
+        Map<String,String> params = new HashMap<>();
+        params.put("path",remotePath);
+        params.put("type",streamType);
+
+        String url = String.format("https://%s/rest/2.0/pcs/file",BaseData.BAIDUPCS_SERVER);
+
+        BufferedHttpEntity bufferedHttpEntity;
+        while (true){
+            bufferedHttpEntity = request("file","streaming")
+        }
+
+        return null;
+    }
 
 }
