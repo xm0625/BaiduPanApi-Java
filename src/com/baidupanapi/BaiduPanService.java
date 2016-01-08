@@ -347,4 +347,38 @@ public class BaiduPanService extends BaseClass{
         return request("filemanager","move",url,params,data,null,null,keyValueArgs);
     }
 
+    /**
+     * 复制文件或文件夹
+     *
+     * @param remotePathList
+     * 待复制的 文件/目录 路径列表
+     *
+     * @param destDir
+     * 复制到的目标目录(结尾有没有/都可以)
+     *
+     * @return
+     * 返回BufferedHttpEntity对象
+     *
+     * 返回正确时返回的 Reponse 对象 content 中的数据结构
+     *
+     * */
+    public BufferedHttpEntity copy(List<String> remotePathList, String destDir,Map<String,Object> keyValueArgs) throws IOException{
+
+        Map<String,String> params = new HashMap<>();
+        params.put("opera","copy");
+
+        List<Map> fileList = new ArrayList<>();
+        for(String remotePath:remotePathList) {
+            Map<String, String> fileInfo = new HashMap<>();
+            fileInfo.put("path",remotePath);
+            fileInfo.put("dest",destDir);
+            fileInfo.put("newname", new File(remotePath.trim()).getName());
+            fileList.add(fileInfo);
+        }
+        Map<String,String> data = new HashMap<>();
+        data.put("filelist",JSON.toJSONString(fileList));
+
+        String url = String.format("http://%s/api/filemanager",BaseData.BAIDUPAN_SERVER);
+        return request("filemanager","move",url,params,data,null,null,keyValueArgs);
+    }
 }
