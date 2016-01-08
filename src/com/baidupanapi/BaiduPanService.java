@@ -381,4 +381,67 @@ public class BaiduPanService extends BaseClass{
         String url = String.format("http://%s/api/filemanager",BaseData.BAIDUPAN_SERVER);
         return request("filemanager","move",url,params,data,null,null,keyValueArgs);
     }
+
+    /**
+     * 删除文件或文件夹
+     *
+     * @param remotePathList
+     * 待删除的 文件/目录 路径列表
+     *
+     * @return
+     * 返回BufferedHttpEntity对象
+     *
+     * 返回正确时返回的 Reponse 对象 content 中的数据结构
+     *
+     * */
+    public BufferedHttpEntity delete(List<String> remotePathList,Map<String,Object> keyValueArgs) throws IOException{
+        Map<String,String> data = new HashMap<>();
+        data.put("filelist",JSON.toJSONString(remotePathList));
+
+        String url = String.format("http://%s/api/filemanager?opera=delete",BaseData.BAIDUPAN_SERVER);
+        return request("filemanager","delete",url,null,data,null,null,keyValueArgs);
+    }
+
+    /**
+     * 批量重命名
+     *
+     * @param renameMapList
+     * 需要重命名的列表.每个List项为一个Map<String,String>,map中放两对键值对,remotePath(网盘中文件/文件夹的路径),newName(新的文件/文件夹名称)
+     * 数据结构示例(json):[{"remotePath":"/test/old.txt","newName":"new.txt"},{"remotePath":"/test/old2.txt","newName":"new2.txt"}]
+     * BaiduPanService baiduPanService = new BaiduPanService("username","password",null);
+     * List<Map<String,String>> renameList = new ArrayList<>();
+     * Map<String,String> pair;
+     * pair = new HashMap<>();
+     * pair.put("remotePath","/idea/sum1.png");
+     * pair.put("newName","sumNew.png");
+     * renameList.add(pair);
+     * pair = new HashMap<>();
+     * pair.put("remotePath","/idea/forumtes.png");
+     * pair.put("newName","forumtesNew.png");
+     * renameList.add(pair);
+     * System.out.println(HttpClientHelper.getResponseString(baiduPanService.rename(renameList, null)));
+     *
+     * @return
+     * 返回BufferedHttpEntity对象
+     *
+     * 返回正确时返回的 Reponse 对象 content 中的数据结构
+     *{"errno":0,"info":[{"errno":0,"path":"\/idea\/sum1.png"},{"errno":0,"path":"\/idea\/forumtes.png"}],"request_id":172838574349644324}
+     * */
+    public BufferedHttpEntity rename(List<Map<String,String>> renameMapList,Map<String,Object> keyValueArgs) throws IOException {
+        Map<String,String> params = new HashMap<>();
+        params.put("opera","rename");
+
+        List<Map<String,String>> renamePairListToSend = new ArrayList<>();
+        for(Map<String,String> map:renameMapList){
+            Map<String,String> pair = new HashMap<>();
+            pair.put("path",map.get("remotePath"));
+            pair.put("newname",map.get("newName"));
+            renamePairListToSend.add(pair);
+        }
+        Map<String,String> data = new HashMap<>();
+        data.put("filelist",JSON.toJSONString(renamePairListToSend));
+
+        String url = String.format("http://%s/api/filemanager",BaseData.BAIDUPAN_SERVER);
+        return request("filemanager","rename",url,params,data,null,null,keyValueArgs);
+    }
 }
