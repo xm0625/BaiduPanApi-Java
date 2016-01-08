@@ -496,4 +496,58 @@ public class BaiduPanService extends BaseClass{
 
         return request("search","search",null,params,null,null,null,keyValueArgs);
     }
+
+    /**
+     * 获取文件缩略图
+     * 好像获取的缩略图都是jpg
+     * 源图片只能是jpg bmp gif png；(通过mime判定而不是后缀)
+     * 得到的缩略图是以高度或宽度为基准(取决于另一边缩放后是否小于所给的另一边)等比缩放.
+     *
+     * @param remotePath
+     * 网盘中文件的保存路径（包含文件名）。
+     * 必须以 / 开头。
+     * Warning:
+     * 路径长度限制为1000；
+     * 径中不能包含以下字符：``\\\\ ? | " > < : *``；
+     * 文件名或路径名开头结尾不能是 ``.``或空白字符，空白字符包括：``\\r, \\n, \\t, 空格, \\0, \\x0B`` 。
+     *
+     * @param height
+     * 高度 单位:px
+     *
+     * @param width
+     * 宽度 单位:px
+     *
+     * @param quality
+     * 质量 最高为100  默认100
+     *
+     * @return
+     * 返回BufferedHttpEntity对象
+     *
+     * 返回正确时返回的 Reponse 对象 content 中的数据结构
+     *
+     * */
+    public BufferedHttpEntity getThumbnail(String remotePath,Integer height,Integer width,Integer quality,Map<String,Object> keyValueArgs) throws IOException{
+        //设置默认值
+        if(quality == null){
+            quality = 100;
+        }
+        if(height == null){
+            height = 99999;
+        }
+        if(width == null){
+            width = 99999;
+        }
+
+        Map<String,String> params = new HashMap<>();
+        params.put("ec","1");
+        params.put("path",remotePath);
+        params.put("height",String.valueOf(height));
+        params.put("width",String.valueOf(width));
+        params.put("quality",String.valueOf(quality));
+
+        String url = String.format("http://%s/rest/2.0/pcs/thumbnail",BaseData.BAIDUPCS_SERVER);
+        return request("thumbnail","generate",url,params,null,null,null,keyValueArgs);
+    }
+
+
 }
