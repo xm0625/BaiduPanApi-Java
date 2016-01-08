@@ -289,7 +289,26 @@ public class BaiduPanService extends BaseClass{
         return request("create","post",null,null,data,null,null,keyValueArgs);
     }
 
+    /**
+     * 批量获得文件的meta信息(元信息)
+     *
+     * @param remotePathList
+     * 文件路径列表
+     *
+     * @return
+     * 返回BufferedHttpEntity对象
+     *
+     * 文件不存在时返回的 Reponse 对象 content 中的数据结构
+     * {"errno":12,"info":[{"errno":-9}],"request_id":3294861771}
+     *
+     * 返回正确时返回的 Reponse 对象 content 中的数据结构
+     * {"errno":0,"info":[{"extent_tinyint4":0,"errno":0,"server_mtime":1452074064,"path_md5":0,"category":3,"fs_id":856165758294527,"isdir":0,"dlink":"http:\/\/d.pcs.baidu.com\/file\/a9158af64630d60abd48b63f61ec0ec1?fid=3758336547-250528-856165758294527&time=1452216674&rt=pr&sign=FDTAER-DCb740ccc5511e5e8fedcff06b081203-numaNWRiJA7BZdmuD1dI%2buarwRc%3d&expires=8h&chkbd=0&chkv=0&dp-logid=171549873206321203&dp-callid=0&r=742915610","md5":"a9158af64630d60abd48b63f61ec0ec1","file_key":"C-IcCHD4I1TPz7TI220KVYI5cgdwF","server_ctime":1452074064,"thumbs":{"icon":"http:\/\/d.pcs.baidu.com\/thumbnail\/a9158af64630d60abd48b63f61ec0ec1?fid=3758336547-250528-856165758294527&time=1452214800&rt=pr&sign=FDTAER-DCb740ccc5511e5e8fedcff06b081203-XMWk2z3WTVMgpCKQCP5Dm7HOzMw%3d&expires=8h&chkbd=0&chkv=0&dp-logid=171549873206321203&dp-callid=0&size=c60_u60&quality=100","url3":"http:\/\/d.pcs.baidu.com\/thumbnail\/a9158af64630d60abd48b63f61ec0ec1?fid=3758336547-250528-856165758294527&time=1452214800&rt=pr&sign=FDTAER-DCb740ccc5511e5e8fedcff06b081203-XMWk2z3WTVMgpCKQCP5Dm7HOzMw%3d&expires=8h&chkbd=0&chkv=0&dp-logid=171549873206321203&dp-callid=0&size=c850_u580&quality=100","url2":"http:\/\/d.pcs.baidu.com\/thumbnail\/a9158af64630d60abd48b63f61ec0ec1?fid=3758336547-250528-856165758294527&time=1452214800&rt=pr&sign=FDTAER-DCb740ccc5511e5e8fedcff06b081203-XMWk2z3WTVMgpCKQCP5Dm7HOzMw%3d&expires=8h&chkbd=0&chkv=0&dp-logid=171549873206321203&dp-callid=0&size=c360_u270&quality=100","url1":"http:\/\/d.pcs.baidu.com\/thumbnail\/a9158af64630d60abd48b63f61ec0ec1?fid=3758336547-250528-856165758294527&time=1452214800&rt=pr&sign=FDTAER-DCb740ccc5511e5e8fedcff06b081203-XMWk2z3WTVMgpCKQCP5Dm7HOzMw%3d&expires=8h&chkbd=0&chkv=0&dp-logid=171549873206321203&dp-callid=0&size=c140_u90&quality=100"},"local_mtime":1452074064,"size":400229,"extent_tinyint1":0,"extent_tinyint3":0,"path":"\/idea\/sum1.png","local_ctime":1452074064,"extent_int3":0,"extent_tinyint2":0,"server_filename":"sum1.png"}],"request_id":171549873206321203}
+     * */
+    public BufferedHttpEntity getMetaInfo(List<String> remotePathList,Map<String,Object> keyValueArgs) throws IOException{
+        Map<String,String> data = new HashMap<>();
+        data.put("target",JSON.toJSONString(remotePathList));
 
-    //TODO meta方法
+        return request("filemetas?blocks=0&dlink=1","filemetas",null,null,data,null,null,keyValueArgs);
+    }
 
 }
