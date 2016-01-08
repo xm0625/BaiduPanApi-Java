@@ -226,7 +226,8 @@ public class BaseClass {
     }
 
     protected BufferedHttpEntity checkLogin(BufferedHttpEntity bufferedHttpEntity) throws IOException {
-        if(ContentType.getOrDefault(bufferedHttpEntity).getMimeType().contains("application/json")) {
+        String mimeString = ContentType.getOrDefault(bufferedHttpEntity).getMimeType();
+        if(mimeString.contains("application/json") || mimeString.contains("text/html")) {
             String content = HttpClientHelper.getResponseString(bufferedHttpEntity);
             System.out.println("checkLogin() content:"+content);
             try {

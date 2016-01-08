@@ -32,6 +32,7 @@ BAIDUPCS_SERVER = 'pcs.baidu.com'
 BAIDUPAN_HEADERS = {"Referer": "http://pan.baidu.com/disk/home",
                     "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/46.0.2490.80 Safari/537.36"}
 
+
 # https://pcs.baidu.com/rest/2.0/pcs/manage?method=listhost -> baidu cdn
 # uses CDN_DOMAIN/monitor.jpg to test speed for each CDN
 api_template = 'http://%s/api/{0}' % BAIDUPAN_SERVER
