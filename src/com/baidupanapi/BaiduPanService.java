@@ -444,4 +444,56 @@ public class BaiduPanService extends BaseClass{
         String url = String.format("http://%s/api/filemanager",BaseData.BAIDUPAN_SERVER);
         return request("filemanager","rename",url,params,data,null,null,keyValueArgs);
     }
+
+    /**
+     * 搜索文件
+     *
+     * @param dir
+     * 网盘中目录的路径，必须以 / 开头。
+     * Warning:
+     * 路径长度限制为1000；
+     * 径中不能包含以下字符：``\\\\ ? | " > < : *``；
+     * 文件名或路径名开头结尾不能是 ``.``或空白字符，空白字符包括：``\\r, \\n, \\t, 空格, \\0, \\x0B`` 。
+     *
+     * @param keyword
+     * 待搜索的关键词
+     *
+     * @param recursion
+     * 是否递归
+     *
+     * @param pageIndex
+     * 返回分页后的第几页的数据
+     *
+     * @param pageSize
+     * 分页-每页条目
+     *
+     * @return
+     * 返回BufferedHttpEntity对象
+     *
+     * 返回正确时返回的 Reponse 对象 content 中的数据结构(与listFile一样)
+     *{"errno":0,"list":[{"fs_id":36703499197873,"path":"\/test","server_filename":"test","server_mtime":1424718197,"server_ctime":1424718197,"local_mtime":1424718197,"local_ctime":1424718197,"isdir":1,"category":6,"size":0}],"request_id":175419953282606388,"has_more":1}
+     * */
+    public BufferedHttpEntity search(String dir,String keyword,Boolean recursion,Integer pageIndex,Integer pageSize,Map<String,Object> keyValueArgs) throws IOException{
+        //设置默认值
+        if(recursion == null){
+            recursion = true;
+        }
+        if(pageIndex == null){
+            pageIndex=1;
+        }
+        if(pageSize == null){
+            pageSize=1;
+        }
+
+        String recursionString = recursion?"1":"0";
+        System.out.println("recursionString:"+recursionString);
+        Map<String,String> params = new HashMap<>();
+        params.put("dir",dir);
+        params.put("recursion",recursionString);
+        params.put("key",keyword);
+        params.put("page",String.valueOf(pageIndex));
+        params.put("num",String.valueOf(pageSize));
+
+        return request("search","search",null,params,null,null,null,keyValueArgs);
+    }
 }

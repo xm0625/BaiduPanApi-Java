@@ -63,26 +63,22 @@ public class BaseClass {
 
         try {
             //通过代理访问
-            /**
             session = HttpClients.custom().useSystemProperties()
                     .setDefaultCookieStore(cookieStore).setProxy(new HttpHost("127.0.0.1", 4443)).setConnectionManager(HttpClientHelper.getSSLNoCheckConnectionManager())
                     .build();
-             */
             //正常访问
-             session = HttpClients.custom().useSystemProperties()
-                     .setDefaultCookieStore(cookieStore).setConnectionManager(HttpClientHelper.getSSLNoCheckConnectionManager())
-             .build();
+//             session = HttpClients.custom().useSystemProperties()
+//                     .setDefaultCookieStore(cookieStore).setConnectionManager(HttpClientHelper.getSSLNoCheckConnectionManager())
+//             .build();
         }catch (NoClassDefFoundError e){
             //通过代理访问
-            /**
             session = HttpClients.custom()
                     .setDefaultCookieStore(cookieStore).setProxy(new HttpHost("127.0.0.1", 4443)).setConnectionManager(HttpClientHelper.getSSLNoCheckConnectionManager())
                     .build();
-             */
             //正常访问
-             session = HttpClients.custom()
-             .setDefaultCookieStore(cookieStore).setConnectionManager(HttpClientHelper.getSSLNoCheckConnectionManager())
-             .build();
+//             session = HttpClients.custom()
+//             .setDefaultCookieStore(cookieStore).setConnectionManager(HttpClientHelper.getSSLNoCheckConnectionManager())
+//             .build();
         }
         this.apiTemplate = apiTemplate;
         this.username = username;
