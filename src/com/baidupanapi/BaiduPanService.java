@@ -3,6 +3,7 @@ package com.baidupanapi;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.baidupanapi.runnable.base.BaseRunnable;
+import com.baidupanapi.util.HttpClientHelper;
 import com.baidupanapi.util.RandomStringGenerator;
 import com.baidupanapi.util.TimeUtil;
 import cz.msebera.android.httpclient.client.methods.CloseableHttpResponse;
@@ -548,6 +549,7 @@ public class BaiduPanService extends BaseClass{
         return request("thumbnail","generate",url,params,null,null,null,keyValueArgs);
     }
 
+    //TODO 注释
     public CloseableHttpResponse getStreaming(String remotePath,String streamType,Map<String,Object> keyValueArgs) throws IOException{
         //设置默认值
         if(streamType == null){
@@ -560,11 +562,29 @@ public class BaiduPanService extends BaseClass{
 
         String url = String.format("https://%s/rest/2.0/pcs/file",BaseData.BAIDUPCS_SERVER);
 
-        CloseableHttpResponse CloseableHttpResponse;
+        CloseableHttpResponse closeableHttpResponse;
         while (true){
-            CloseableHttpResponse = request("file","streaming",url,params,null,null,null,keyValueArgs);
-            return CloseableHttpResponse;
+            closeableHttpResponse  = request("file","streaming",url,params,null,null,null,keyValueArgs);
+            if(closeableHttpResponse.getStatusLine().getStatusCode() != 200){
+                JSONObject resultJsonObject = (JSONObject) JSON.parse(HttpClientHelper.getResponseString(closeableHttpResponse));
+                if("31345".equals(resultJsonObject.getString("error_code"))){
+                    //再试一次
+                    continue;
+                }
+            }
+            return closeableHttpResponse;
         }
+    }
+
+
+    //TODO 注释
+    public CloseableHttpResponse getDownloadUrl(String remotePath,Map<String,Object> keyValueArgs) throws IOException{
+
+        Map<String,String> params = new HashMap<>();
+        params.put("path",remotePath);
+
+        String url = String.format("https://%s/rest/2.0/pcs/file",BaseData.BAIDUPCS_SERVER);
+        return request("file","locatedownload",url,params,null,null,null,keyValueArgs);
     }
 
 }
