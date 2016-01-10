@@ -63,8 +63,8 @@ public class BaseData {
 
 
     public static void main(String[] args) throws Exception {
-        BaiduPanService baiduPanService = new BaiduPanService("402276694","19930625",null);
-        baiduPanService.getThumbnail("/idea/1.zip",50,51,null,null).writeTo(new FileOutputStream(new File("/home/xm/thumb2.jpg")));
+        BaiduPanService baiduPanService = new BaiduPanService("username","password",null);
+        baiduPanService.getThumbnail("/idea/1.zip",50,51,null,null).getEntity().writeTo(new FileOutputStream(new File("/home/xm/thumb2.jpg")));
     }
 
     public static String getTokenApi(){
