@@ -1,6 +1,7 @@
 package com.baidupanapi.util;
 
 
+import cz.msebera.android.httpclient.HttpEntity;
 import cz.msebera.android.httpclient.NameValuePair;
 import cz.msebera.android.httpclient.client.CookieStore;
 import cz.msebera.android.httpclient.client.entity.UrlEncodedFormEntity;
@@ -127,7 +128,8 @@ public class HttpClientHelper {
 
 
 
-    public static String getResponseString(BufferedHttpEntity bufferedHttpEntity,String charset) throws IOException {
+    public static String getResponseString(CloseableHttpResponse closeableHttpResponse,String charset) throws IOException {
+        HttpEntity bufferedHttpEntity = closeableHttpResponse.getEntity();
         if(charset == null){
             charset = CHARSET;
         }
@@ -135,13 +137,8 @@ public class HttpClientHelper {
     }
 
     public static String getResponseString(CloseableHttpResponse closeableHttpResponse) throws IOException {
-        return getResponseString(new BufferedHttpEntity(closeableHttpResponse.getEntity()), null);
+        return getResponseString(closeableHttpResponse, null);
     }
-
-    public static String getResponseString(BufferedHttpEntity bufferedHttpEntity) throws IOException {
-        return getResponseString(bufferedHttpEntity, null);
-    }
-
 
     public static void dumpCookies(CookieStore cookieStore){
         System.out.println("dump");

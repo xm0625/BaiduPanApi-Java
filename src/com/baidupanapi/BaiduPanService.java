@@ -6,7 +6,6 @@ import com.baidupanapi.runnable.base.BaseRunnable;
 import com.baidupanapi.util.RandomStringGenerator;
 import com.baidupanapi.util.TimeUtil;
 import cz.msebera.android.httpclient.client.methods.CloseableHttpResponse;
-import cz.msebera.android.httpclient.entity.BufferedHttpEntity;
 
 import java.io.File;
 import java.io.IOException;
@@ -29,12 +28,12 @@ public class BaiduPanService extends BaseClass{
      * 获得配额信息
      *
      * @return
-     * 返回BufferedHttpEntity对象
+     * 返回CloseableHttpResponse对象
      *
      * 返回正确时返回字符串中的数据结构
      * {"errno":0,"total":配额字节数,"used":已使用字节数,"request_id":请求识别号}
      * */
-    public BufferedHttpEntity quota(Map<String,Object> keyValueArgs) throws IOException {
+    public CloseableHttpResponse quota(Map<String,Object> keyValueArgs) throws IOException {
         return request("quota",null,null,null,null,null,null,keyValueArgs);
     }
 
@@ -61,13 +60,13 @@ public class BaiduPanService extends BaseClass{
      * 返回条目数量控制,尾条序号。返回结果集的[startIndex, endIndex)之间的条目，缺省返回所有条目；
      *
      * @return
-     * 返回BufferedHttpEntity对象
+     * 返回CloseableHttpResponse对象
      *
      * 返回正确时返回字符串中的数据结构
      * {"path":"服务器文件路径","size":文件大小,"ctime":创建时间,"mtime":修改时间,"md5":"文件md5值","fs_id":服务器文件识别号,"isdir":是否为目录,"request_id":请求识别号}
      * {"errno":0,"list":[{"local_mtime":1436591022,"size":0,"category":6,"fs_id":8003570172228,"path":"\/\u6211\u7684\u8d44\u6e90\/\u5206\u6b67\u80052","local_ctime":1436591022,"isdir":1,"server_ctime":1436591022,"server_mtime":1438861057,"server_filename":"\u5206\u6b67\u80052"},{"local_mtime":1435597875,"size":0,"category":6,"fs_id":563220016636297,"path":"\/\u6211\u7684\u8d44\u6e90\/\u7ec8\u7ed3\u80055\uff1a\u521b\u4e16\u7eaa (2015)\u9ad8\u6e05\u7535\u5f71\u7248","local_ctime":1435597875,"isdir":1,"server_ctime":1435597875,"server_mtime":1438947957,"server_filename":"\u7ec8\u7ed3\u80055\uff1a\u521b\u4e16\u7eaa (2015)\u9ad8\u6e05\u7535\u5f71\u7248"},{"server_mtime":1429343067,"category":4,"fs_id":289993814634795,"server_ctime":1397193508,"local_mtime":1397193508,"size":198637850,"isdir":0,"path":"\/\u6211\u7684\u8d44\u6e90\/Spring 3.0\u5c31\u8fd9\u4e48\u7b80\u5355.pdf","local_ctime":1397193508,"md5":"dac5745d3e97150c5a22947bf0b2c2ee","server_filename":"Spring 3.0\u5c31\u8fd9\u4e48\u7b80\u5355.pdf"},{"server_mtime":1429343829,"category":4,"fs_id":131386538923398,"server_ctime":1380419983,"local_mtime":1380419981,"size":97381564,"isdir":0,"path":"\/\u6211\u7684\u8d44\u6e90\/[www.java1234.com]Spring 3.x\u4f01\u4e1a\u5e94\u7528\u5f00\u53d1\u5b9e\u6218\uff08\u9ad8\u6e05\u7248\uff09.pdf","local_ctime":1380419981,"md5":"6cd932cba3e07ac5f893cc3700308e95","server_filename":"[www.java1234.com]Spring 3.x\u4f01\u4e1a\u5e94\u7528\u5f00\u53d1\u5b9e\u6218\uff08\u9ad8\u6e05\u7248\uff09.pdf"},{"server_mtime":1430185796,"category":6,"fs_id":657248952967289,"server_ctime":1417609601,"local_mtime":1417609601,"size":35718,"isdir":0,"path":"\/\u6211\u7684\u8d44\u6e90\/VMware.Workstation.v11.0.0.Incl.Keymaker-EMBRACE.rar","local_ctime":1417609601,"md5":"27b8ad4eb46ca51ddfc43cd018f9b3eb","server_filename":"VMware.Workstation.v11.0.0.Incl.Keymaker-EMBRACE.rar"},{"server_mtime":1435953497,"category":6,"fs_id":858048201335917,"server_ctime":1435953497,"local_mtime":1435953497,"size":4130,"isdir":0,"path":"\/\u6211\u7684\u8d44\u6e90\/jennifer.ovpn","local_ctime":1435953497,"md5":"9a4baeb5e5d331edfd74de392da8bbe3","server_filename":"jennifer.ovpn"},{"server_mtime":1436720432,"category":4,"fs_id":410246317449529,"server_ctime":1365773406,"local_mtime":1365773405,"size":52198955,"isdir":0,"path":"\/\u6211\u7684\u8d44\u6e90\/Git\u6743\u5a01\u6307\u5357.pdf","local_ctime":1365773405,"md5":"6bfaf57228e59098150c4e41575f09bb","server_filename":"Git\u6743\u5a01\u6307\u5357.pdf"},{"server_mtime":1438859077,"category":1,"fs_id":1123162186822579,"server_ctime":1427971686,"local_mtime":1427971681,"size":1107784078,"isdir":0,"path":"\/\u6211\u7684\u8d44\u6e90\/FQZ2.mp4","local_ctime":1427971681,"md5":"a644dd29434521256015ad8bd3438b5e","server_filename":"FQZ2.mp4"},{"server_mtime":1438860942,"category":1,"fs_id":135626887013087,"server_ctime":1428140141,"local_mtime":1428140138,"size":1107824938,"isdir":0,"path":"\/\u6211\u7684\u8d44\u6e90\/\u5206\u671f\u52192 \u7ffb\u76d8\u8005www.565k.com \u9ad8\u6e05\u4e91\u5f71\u89c6.mkv","local_ctime":1428140138,"md5":"f6f74229ad434f47791dad6b6523b79a","server_filename":"\u5206\u671f\u52192 \u7ffb\u76d8\u8005www.565k.com \u9ad8\u6e05\u4e91\u5f71\u89c6.mkv"},{"server_mtime":1443721281,"category":6,"fs_id":801453533140931,"server_ctime":1442198590,"local_mtime":1442198590,"size":774759442,"isdir":0,"path":"\/\u6211\u7684\u8d44\u6e90\/miui_HMNote2_V6.7.5.0.LHMCNCH_7b45a9a562_5.0.zip","local_ctime":1442198590,"md5":"2e5657fa28748524d228408d32d274fd","server_filename":"miui_HMNote2_V6.7.5.0.LHMCNCH_7b45a9a562_5.0.zip"},{"server_mtime":1449235296,"category":6,"fs_id":381138983436276,"server_ctime":1438535416,"local_mtime":1438535416,"size":1048142,"isdir":0,"path":"\/\u6211\u7684\u8d44\u6e90\/KMS10.rar","local_ctime":1438535416,"md5":"d3b2c1fcbfe1c7be24234850163e769f","server_filename":"KMS10.rar"}],"request_id":104506677824701356}
      * */
-    public BufferedHttpEntity listFiles(String dir,String orderBy,String orderType,Integer startIndex,Integer endIndex, Map<String,Object> keyValueArgs) throws IOException {
+    public CloseableHttpResponse listFiles(String dir,String orderBy,String orderType,Integer startIndex,Integer endIndex, Map<String,Object> keyValueArgs) throws IOException {
         //设置默认值
         if(orderBy == null){
             orderBy = "name";
@@ -115,13 +114,13 @@ public class BaiduPanService extends BaseClass{
      *  上传进度回调函数 需要包含 size 和 progress 名字的参数
      *
      * @return
-     * 返回BufferedHttpEntity对象
+     * 返回CloseableHttpResponse对象
      *
      * 返回正确时返回的 Reponse 对象 content 中的数据结构
      * {"md5":"片段的 md5 值","request_id":请求识别号}
      *
      * */
-    public BufferedHttpEntity upload(String dir,File file,String fileName,String onDuplicate,BaseRunnable callback, Map<String,Object> keyValueArgs) throws IOException {
+    public CloseableHttpResponse upload(String dir,File file,String fileName,String onDuplicate,BaseRunnable callback, Map<String,Object> keyValueArgs) throws IOException {
         //设置默认值
         if(onDuplicate == null){
             onDuplicate = "newcopy";
@@ -153,13 +152,13 @@ public class BaiduPanService extends BaseClass{
      *  上传进度回调函数 需要包含 size 和 progress 名字的参数
      *
      * @return
-     * 返回BufferedHttpEntity对象
+     * 返回CloseableHttpResponse对象
      *
      * 返回正确时返回的 Reponse 对象 content 中的数据结构
      *{"md5":"e2e97f6beecef06297c359f23fb80787","request_id":132762480465050585}
      *
      * */
-    public BufferedHttpEntity uploadTempFile(File file,BaseRunnable callback, Map<String,Object> keyValueArgs) throws IOException {
+    public CloseableHttpResponse uploadTempFile(File file,BaseRunnable callback, Map<String,Object> keyValueArgs) throws IOException {
 
         Map<String,String> params = new HashMap<>();
         params.put("type","tmpfile");
@@ -197,14 +196,14 @@ public class BaiduPanService extends BaseClass{
      *  上传进度回调函数 需要包含 size 和 progress 名字的参数
      *
      * @return
-     * 返回BufferedHttpEntity对象
+     * 返回CloseableHttpResponse对象
      *
      * 返回正确时返回的 Reponse 对象 content 中的数据结构
      * {"path":"服务器文件路径","size":文件大小,"ctime":创建时间,"mtime":修改时间,"md5":"文件md5值","fs_id":服务器文件识别号,"isdir":是否为目录,"request_id":请求识别号}
      * {"path":"/idea/sum1.png","size":"400229","ctime":1452074064,"mtime":1452074064,"md5":"a9158af64630d60abd48b63f61ec0ec1","fs_id":856165758294527,"isdir":0,"block_list":["e2e97f6beecef06297c359f23fb80787","b414e35fa1f199e58e2d33c87c9abbe7"],"s3_handle":"a9158af64630d60abd48b63f61ec0ec1","request_id":133268526075081325}
      *
      * */
-    public BufferedHttpEntity uploadCreateSuperFile(String remotePath,List<String> blockList,String onDuplicate,BaseRunnable callback, Map<String,Object> keyValueArgs) throws IOException {
+    public CloseableHttpResponse uploadCreateSuperFile(String remotePath,List<String> blockList,String onDuplicate,BaseRunnable callback, Map<String,Object> keyValueArgs) throws IOException {
         //设置默认值
         if(onDuplicate == null){
             onDuplicate = "newcopy";
@@ -228,7 +227,7 @@ public class BaiduPanService extends BaseClass{
      * 用法示例:
      * 1.标准下载(小文件)
      * BaiduPanService baiduPanService = new BaiduPanService("username","password",null);
-     * baiduPanService.download("/idea/sum1.png",null).writeTo(new FileOutputStream(new File("/Users/xm/Downloads/sum1.png")));
+     * baiduPanService.download("/idea/sum1.png",null).getEntity().writeTo(new FileOutputStream(new File("/Users/xm/Downloads/sum1.png")));
      *
      * 2.分块下载
      * ps:download 接口支持HTTP协议标准range定义，通过指定range的取值可以实现断点下载功能.
@@ -239,7 +238,7 @@ public class BaiduPanService extends BaseClass{
      * Map<String,String> headers = new HashMap<>();
      * headers.put("Range","bytes=0-99");
      * keyValueMap.put("headers",headers);
-     * baiduPanService.download("/idea/sum1.png",keyValueMap).writeTo(new FileOutputStream(new File("/Users/xm/Downloads/sum1.png")));
+     * baiduPanService.download("/idea/sum1.png",keyValueMap).getEntity().writeTo(new FileOutputStream(new File("/Users/xm/Downloads/sum1.png")));
      *
      * @param remotePath
      * 网盘中文件的保存路径（包含文件名）。
@@ -250,12 +249,12 @@ public class BaiduPanService extends BaseClass{
      * 文件名或路径名开头结尾不能是 ``.``或空白字符，空白字符包括：``\\r, \\n, \\t, 空格, \\0, \\x0B`` 。
      *
      * @return
-     * 返回BufferedHttpEntity对象
+     * 返回CloseableHttpResponse对象
      *
      * 返回正确时 直接返回文件流
      *
      * */
-    public BufferedHttpEntity download(String remotePath, Map<String,Object> keyValueArgs) throws IOException {
+    public CloseableHttpResponse download(String remotePath, Map<String,Object> keyValueArgs) throws IOException {
         Map<String,String> params = new HashMap<>();
         params.put("path",remotePath);
 
@@ -274,13 +273,13 @@ public class BaiduPanService extends BaseClass{
      * 文件名或路径名开头结尾不能是 ``.``或空白字符，空白字符包括：``\\r, \\n, \\t, 空格, \\0, \\x0B`` 。
      *
      * @return
-     * 返回BufferedHttpEntity对象
+     * 返回CloseableHttpResponse对象
      *
      * 返回正确时返回的 Reponse 对象 content 中的数据结构
      * {"fs_id":服务器文件识别号,"path":"路径","ctime":创建时间,"mtime":修改时间,"status":0,"isdir":1,"errno":0,"name":"文件路径"}
      * {"fs_id":1032452464958854,"path":"\/pcs","ctime":1452179755,"mtime":1452179755,"status":0,"isdir":1,"errno":0,"name":"\/pcs"}
      * */
-    public BufferedHttpEntity mkdir(String dir, Map<String,Object> keyValueArgs) throws IOException{
+    public CloseableHttpResponse mkdir(String dir, Map<String,Object> keyValueArgs) throws IOException{
         Map<String,String> data = new HashMap<>();
         data.put("path",dir);
         data.put("isdir","1");
@@ -297,7 +296,7 @@ public class BaiduPanService extends BaseClass{
      * 文件/目录 路径列表
      *
      * @return
-     * 返回BufferedHttpEntity对象
+     * 返回CloseableHttpResponse对象
      *
      * 文件/目录 不存在时返回的 Reponse 对象 content 中的数据结构
      * {"errno":12,"info":[{"errno":-9}],"request_id":3294861771}
@@ -305,7 +304,7 @@ public class BaiduPanService extends BaseClass{
      * 返回正确时返回的 Reponse 对象 content 中的数据结构
      * {"errno":0,"info":[{"extent_tinyint4":0,"errno":0,"server_mtime":1452074064,"path_md5":0,"category":3,"fs_id":856165758294527,"isdir":0,"dlink":"http:\/\/d.pcs.baidu.com\/file\/a9158af64630d60abd48b63f61ec0ec1?fid=3758336547-250528-856165758294527&time=1452216674&rt=pr&sign=FDTAER-DCb740ccc5511e5e8fedcff06b081203-numaNWRiJA7BZdmuD1dI%2buarwRc%3d&expires=8h&chkbd=0&chkv=0&dp-logid=171549873206321203&dp-callid=0&r=742915610","md5":"a9158af64630d60abd48b63f61ec0ec1","file_key":"C-IcCHD4I1TPz7TI220KVYI5cgdwF","server_ctime":1452074064,"thumbs":{"icon":"http:\/\/d.pcs.baidu.com\/thumbnail\/a9158af64630d60abd48b63f61ec0ec1?fid=3758336547-250528-856165758294527&time=1452214800&rt=pr&sign=FDTAER-DCb740ccc5511e5e8fedcff06b081203-XMWk2z3WTVMgpCKQCP5Dm7HOzMw%3d&expires=8h&chkbd=0&chkv=0&dp-logid=171549873206321203&dp-callid=0&size=c60_u60&quality=100","url3":"http:\/\/d.pcs.baidu.com\/thumbnail\/a9158af64630d60abd48b63f61ec0ec1?fid=3758336547-250528-856165758294527&time=1452214800&rt=pr&sign=FDTAER-DCb740ccc5511e5e8fedcff06b081203-XMWk2z3WTVMgpCKQCP5Dm7HOzMw%3d&expires=8h&chkbd=0&chkv=0&dp-logid=171549873206321203&dp-callid=0&size=c850_u580&quality=100","url2":"http:\/\/d.pcs.baidu.com\/thumbnail\/a9158af64630d60abd48b63f61ec0ec1?fid=3758336547-250528-856165758294527&time=1452214800&rt=pr&sign=FDTAER-DCb740ccc5511e5e8fedcff06b081203-XMWk2z3WTVMgpCKQCP5Dm7HOzMw%3d&expires=8h&chkbd=0&chkv=0&dp-logid=171549873206321203&dp-callid=0&size=c360_u270&quality=100","url1":"http:\/\/d.pcs.baidu.com\/thumbnail\/a9158af64630d60abd48b63f61ec0ec1?fid=3758336547-250528-856165758294527&time=1452214800&rt=pr&sign=FDTAER-DCb740ccc5511e5e8fedcff06b081203-XMWk2z3WTVMgpCKQCP5Dm7HOzMw%3d&expires=8h&chkbd=0&chkv=0&dp-logid=171549873206321203&dp-callid=0&size=c140_u90&quality=100"},"local_mtime":1452074064,"size":400229,"extent_tinyint1":0,"extent_tinyint3":0,"path":"\/idea\/sum1.png","local_ctime":1452074064,"extent_int3":0,"extent_tinyint2":0,"server_filename":"sum1.png"}],"request_id":171549873206321203}
      * */
-    public BufferedHttpEntity getMetaInfo(List<String> remotePathList,Map<String,Object> keyValueArgs) throws IOException{
+    public CloseableHttpResponse getMetaInfo(List<String> remotePathList,Map<String,Object> keyValueArgs) throws IOException{
         Map<String,String> data = new HashMap<>();
         data.put("target",JSON.toJSONString(remotePathList));
 
@@ -322,12 +321,12 @@ public class BaiduPanService extends BaseClass{
      * 移动到的目标目录(结尾有没有/都可以)
      *
      * @return
-     * 返回BufferedHttpEntity对象
+     * 返回CloseableHttpResponse对象
      *
      * 返回正确时返回的 Reponse 对象 content 中的数据结构
      * {"errno":0,"info":[{"errno":0,"path":"\/idea\/sum1.png"}],"request_id":171996442348120975}
      * */
-    public BufferedHttpEntity move(List<String> remotePathList, String destDir,Map<String,Object> keyValueArgs) throws IOException{
+    public CloseableHttpResponse move(List<String> remotePathList, String destDir,Map<String,Object> keyValueArgs) throws IOException{
 
         Map<String,String> params = new HashMap<>();
         params.put("opera","move");
@@ -357,12 +356,12 @@ public class BaiduPanService extends BaseClass{
      * 复制到的目标目录(结尾有没有/都可以)
      *
      * @return
-     * 返回BufferedHttpEntity对象
+     * 返回CloseableHttpResponse对象
      *
      * 返回正确时返回的 Reponse 对象 content 中的数据结构
      *
      * */
-    public BufferedHttpEntity copy(List<String> remotePathList, String destDir,Map<String,Object> keyValueArgs) throws IOException{
+    public CloseableHttpResponse copy(List<String> remotePathList, String destDir,Map<String,Object> keyValueArgs) throws IOException{
 
         Map<String,String> params = new HashMap<>();
         params.put("opera","copy");
@@ -389,12 +388,12 @@ public class BaiduPanService extends BaseClass{
      * 待删除的 文件/目录 路径列表
      *
      * @return
-     * 返回BufferedHttpEntity对象
+     * 返回CloseableHttpResponse对象
      *
      * 返回正确时返回的 Reponse 对象 content 中的数据结构
      *
      * */
-    public BufferedHttpEntity delete(List<String> remotePathList,Map<String,Object> keyValueArgs) throws IOException{
+    public CloseableHttpResponse delete(List<String> remotePathList,Map<String,Object> keyValueArgs) throws IOException{
         Map<String,String> data = new HashMap<>();
         data.put("filelist",JSON.toJSONString(remotePathList));
 
@@ -422,12 +421,12 @@ public class BaiduPanService extends BaseClass{
      * System.out.println(HttpClientHelper.getResponseString(baiduPanService.rename(renameList, null)));
      *
      * @return
-     * 返回BufferedHttpEntity对象
+     * 返回CloseableHttpResponse对象
      *
      * 返回正确时返回的 Reponse 对象 content 中的数据结构
      *{"errno":0,"info":[{"errno":0,"path":"\/idea\/sum1.png"},{"errno":0,"path":"\/idea\/forumtes.png"}],"request_id":172838574349644324}
      * */
-    public BufferedHttpEntity rename(List<Map<String,String>> renameMapList,Map<String,Object> keyValueArgs) throws IOException {
+    public CloseableHttpResponse rename(List<Map<String,String>> renameMapList,Map<String,Object> keyValueArgs) throws IOException {
         Map<String,String> params = new HashMap<>();
         params.put("opera","rename");
 
@@ -468,12 +467,12 @@ public class BaiduPanService extends BaseClass{
      * 分页-每页条目
      *
      * @return
-     * 返回BufferedHttpEntity对象
+     * 返回CloseableHttpResponse对象
      *
      * 返回正确时返回的 Reponse 对象 content 中的数据结构(与listFile一样)
      *{"errno":0,"list":[{"fs_id":36703499197873,"path":"\/test","server_filename":"test","server_mtime":1424718197,"server_ctime":1424718197,"local_mtime":1424718197,"local_ctime":1424718197,"isdir":1,"category":6,"size":0}],"request_id":175419953282606388,"has_more":1}
      * */
-    public BufferedHttpEntity search(String dir,String keyword,Boolean recursion,Integer pageIndex,Integer pageSize,Map<String,Object> keyValueArgs) throws IOException{
+    public CloseableHttpResponse search(String dir,String keyword,Boolean recursion,Integer pageIndex,Integer pageSize,Map<String,Object> keyValueArgs) throws IOException{
         //设置默认值
         if(recursion == null){
             recursion = true;
@@ -521,12 +520,12 @@ public class BaiduPanService extends BaseClass{
      * 质量 最高为100  默认100
      *
      * @return
-     * 返回BufferedHttpEntity对象
+     * 返回CloseableHttpResponse对象
      *
      * 返回正确时返回的 Reponse 对象 content 中的数据结构
      *
      * */
-    public BufferedHttpEntity getThumbnail(String remotePath,Integer height,Integer width,Integer quality,Map<String,Object> keyValueArgs) throws IOException{
+    public CloseableHttpResponse getThumbnail(String remotePath,Integer height,Integer width,Integer quality,Map<String,Object> keyValueArgs) throws IOException{
         //设置默认值
         if(quality == null){
             quality = 100;
@@ -549,7 +548,7 @@ public class BaiduPanService extends BaseClass{
         return request("thumbnail","generate",url,params,null,null,null,keyValueArgs);
     }
 
-    public BufferedHttpEntity getStreaming(String remotePath,String streamType,Map<String,Object> keyValueArgs) throws IOException{
+    public CloseableHttpResponse getStreaming(String remotePath,String streamType,Map<String,Object> keyValueArgs) throws IOException{
         //设置默认值
         if(streamType == null){
             streamType = "M3U8_AUTO_480";
@@ -561,12 +560,11 @@ public class BaiduPanService extends BaseClass{
 
         String url = String.format("https://%s/rest/2.0/pcs/file",BaseData.BAIDUPCS_SERVER);
 
-        BufferedHttpEntity bufferedHttpEntity;
+        CloseableHttpResponse CloseableHttpResponse;
         while (true){
-            bufferedHttpEntity = request("file","streaming")
+            CloseableHttpResponse = request("file","streaming",url,params,null,null,null,keyValueArgs);
+            return CloseableHttpResponse;
         }
-
-        return null;
     }
 
 }

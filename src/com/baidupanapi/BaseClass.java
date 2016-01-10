@@ -6,6 +6,7 @@ import com.baidupanapi.exception.base.LoginFailedException;
 import com.baidupanapi.runnable.base.BaseRunnable;
 import com.baidupanapi.util.*;
 import com.sun.corba.se.impl.legacy.connection.DefaultSocketFactory;
+import cz.msebera.android.httpclient.HttpEntity;
 import cz.msebera.android.httpclient.HttpHost;
 import cz.msebera.android.httpclient.client.CookieStore;
 import cz.msebera.android.httpclient.client.methods.CloseableHttpResponse;
@@ -63,22 +64,22 @@ public class BaseClass {
 
         try {
             //通过代理访问
-            session = HttpClients.custom().useSystemProperties()
-                    .setDefaultCookieStore(cookieStore).setProxy(new HttpHost("127.0.0.1", 4443)).setConnectionManager(HttpClientHelper.getSSLNoCheckConnectionManager())
-                    .build();
+//            session = HttpClients.custom().useSystemProperties()
+//                    .setDefaultCookieStore(cookieStore).setProxy(new HttpHost("127.0.0.1", 4443)).setConnectionManager(HttpClientHelper.getSSLNoCheckConnectionManager())
+//                    .build();
             //正常访问
-//             session = HttpClients.custom().useSystemProperties()
-//                     .setDefaultCookieStore(cookieStore).setConnectionManager(HttpClientHelper.getSSLNoCheckConnectionManager())
-//             .build();
+             session = HttpClients.custom().useSystemProperties()
+                     .setDefaultCookieStore(cookieStore).setConnectionManager(HttpClientHelper.getSSLNoCheckConnectionManager())
+             .build();
         }catch (NoClassDefFoundError e){
             //通过代理访问
-            session = HttpClients.custom()
-                    .setDefaultCookieStore(cookieStore).setProxy(new HttpHost("127.0.0.1", 4443)).setConnectionManager(HttpClientHelper.getSSLNoCheckConnectionManager())
-                    .build();
+//            session = HttpClients.custom()
+//                    .setDefaultCookieStore(cookieStore).setProxy(new HttpHost("127.0.0.1", 4443)).setConnectionManager(HttpClientHelper.getSSLNoCheckConnectionManager())
+//                    .build();
             //正常访问
-//             session = HttpClients.custom()
-//             .setDefaultCookieStore(cookieStore).setConnectionManager(HttpClientHelper.getSSLNoCheckConnectionManager())
-//             .build();
+             session = HttpClients.custom()
+             .setDefaultCookieStore(cookieStore).setConnectionManager(HttpClientHelper.getSSLNoCheckConnectionManager())
+             .build();
         }
         this.apiTemplate = apiTemplate;
         this.username = username;
@@ -225,10 +226,11 @@ public class BaseClass {
         return new PublicKeyEntity(jsonObject.getString("pubkey"),jsonObject.getString("key"));
     }
 
-    protected BufferedHttpEntity checkLogin(BufferedHttpEntity bufferedHttpEntity) throws IOException {
+    protected CloseableHttpResponse checkLogin(CloseableHttpResponse closeableHttpResponse) throws IOException {
+        HttpEntity bufferedHttpEntity = closeableHttpResponse.getEntity();
         String mimeString = ContentType.getOrDefault(bufferedHttpEntity).getMimeType();
         if(mimeString.contains("application/json") || mimeString.contains("text/html")) {
-            String content = HttpClientHelper.getResponseString(bufferedHttpEntity);
+            String content = HttpClientHelper.getResponseString(closeableHttpResponse);
             System.out.println("checkLogin() content:"+content);
             try {
                 JSONObject jsonObject = (JSONObject) JSON.parse(content);
@@ -239,12 +241,12 @@ public class BaseClass {
             } catch (Exception e) {
             }
         }
-        return bufferedHttpEntity;
+        return closeableHttpResponse;
     }
 
 
 
-    protected BufferedHttpEntity request(String uri,String method, String url, Map<String,String> extraParams, Map<String,String> data, Map<String,File> files, BaseRunnable callback, Map<String,Object> keyValueArgs) throws IOException {
+    protected CloseableHttpResponse request(String uri,String method, String url, Map<String,String> extraParams, Map<String,String> data, Map<String,File> files, BaseRunnable callback, Map<String,Object> keyValueArgs) throws IOException {
         if(keyValueArgs == null){
             keyValueArgs = new HashMap<>();
         }
@@ -298,8 +300,8 @@ public class BaseClass {
             }
         }
         BufferedHttpEntity bufferedHttpEntity = new BufferedHttpEntity(response.getEntity());
-        checkLogin(bufferedHttpEntity);
-        return bufferedHttpEntity;
+        response.setEntity(bufferedHttpEntity);
+        return checkLogin(response);
     }
 
     class ShowCaptchaRunnable extends BaseRunnable {
