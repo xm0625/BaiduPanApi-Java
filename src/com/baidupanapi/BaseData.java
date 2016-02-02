@@ -8,7 +8,6 @@ import com.baidupanapi.util.TimeUtil;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.*;
 
 public class BaseData {
@@ -63,8 +62,12 @@ public class BaseData {
 
 
     public static void main(String[] args) throws Exception {
-        BaiduPanService baiduPanService = new BaiduPanService("username","password",null);
-        baiduPanService.getThumbnail("/idea/1.zip",50,51,null,null).getEntity().writeTo(new FileOutputStream(new File("/home/xm/thumb2.jpg")));
+        BaiduPanService baiduPanService = new BaiduPanService("","",null);
+
+        Downloader downloader = new Downloader(baiduPanService,"/macsoft/MAContent10_GarageBandCoreContent_v3.pkg","/home/xm/桌面/testdownload/MAContent10_GarageBandCoreContent_v3.pkg");
+        downloader.start();
+
+//        baiduPanService.download("/macsoft/MAContent10_GarageBandCoreContent_v3.pkg",null).getEntity().writeTo(new FileOutputStream(new File("/home/xm/下载/download.test")));
     }
 
     public static String getTokenApi(){
